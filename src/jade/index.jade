@@ -1,0 +1,6 @@
+extends layout-blocks/layout
+block content
+  .grid
+    each i in [0,1,2,3]
+      .grid__cell(data-cell-number= i)
+  button.game__start Start
