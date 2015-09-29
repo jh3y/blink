@@ -1,23 +1,31 @@
-PROPS =
+DOMATTRIBUTES =
   gameStarter: '.game__start'
   gameReset  : '.game__reset'
   grid       : '.grid'
+  gridCells  : '[data-cell-number]'
+
+UICACHE =
+  gameStarter: DOMATTRIBUTES.gameStarter
+  gameReset  : DOMATTRIBUTES.gameReset
+  grid       : DOMATTRIBUTES.grid
 
 STATE =
   inplay: false
 
 OPTIONS =
-  sequenceLength: 4
-  gridSize      : 4
+  sequenceLength   : 4
+  gridSize         : 4
+  animationDuration: '.5s'
 
 GAME = {}
 
 ###
-  Initiate UI component cacheing
+  UI component cacheing
 ###
 UI   = {}
-for ui of PROPS
-  UI[ui] = document.querySelector PROPS[ui]
+for ui of UICACHE
+  UI[ui] = document.querySelector UICACHE[ui]
+UI.cells = document.querySelectorAll DOMATTRIBUTES.gridCells
 
 ###
   Game handling functions
@@ -31,11 +39,12 @@ displaySequence  = (blinks) ->
     gridNo = blinks.pop()
     cell = document.querySelector '[data-cell-number="' + gridNo + '"]'
     showNext = (e) ->
-      console.log this
       this.removeEventListener 'animationend', showNext
       this.className = 'grid__cell'
       if blinks.length is 0
         console.log 'COMPLETE'
+        STATE.inplay = true
+        GAME.inputSequence = []
       else
         setTimeout(->
           displaySequence blinks
@@ -57,9 +66,12 @@ resetGame = ->
   GAME.level          = 1
   GAME.sequenceLength = OPTIONS.sequenceLength
   GAME.gridSize       = OPTIONS.gridSize
+  for cell in UI.cells
+    cell.style.animationDuration = OPTIONS.animationDuration
 
 startGame = ->
   levelSequence = generateSequence GAME.gridSize, GAME.sequenceLength
+  GAME.levelSequence = levelSequence.slice()
   setTimeout(->
     console.info levelSequence
     displaySequence levelSequence
@@ -80,7 +92,14 @@ initGame = ->
 
 handleUserInput = (e) ->
   if STATE.inplay
-    console.log e.target, e.currentTarget
+    input = parseInt e.target.getAttribute('data-cell-number'), 10
+    GAME.inputSequence.unshift input
+    if GAME.inputSequence.length is GAME.levelSequence.length
+      if _.isEqual GAME.inputSequence, GAME.levelSequence
+        alert 'YAY, you did it!!!'
+      else
+        alert 'Oh well, try again...'
+
 ######
 
 

@@ -92,6 +92,27 @@ gulp.task('jade:watch', function(event){
   gulp.watch(sources.jade, ['jade:compile']);
 });
 
+
+gulp.task('vendor:scripts:publish', function(e) {
+  return gulp.src(sources.vendor.js)
+    .pipe(plugins.concat('vendor.min.js'))
+    .pipe(plugins.uglify())
+    .pipe(gulp.dest(destinations.js));
+});
+
+gulp.task('vendor:styles:publish', function(e) {
+  return gulp.src(sources.vendor.css)
+    .pipe(plugins.concat('vendor.min.css'))
+    .pipe(plugins.minify())
+    .pipe(gulp.dest(destinations.css));
+});
+
+gulp.task('vendor:publish', [
+  'vendor:scripts:publish',
+  'vendor:styles:publish'
+]);
+
+
 gulp.task('deploy:ghpages', ['build:complete'], function(event) {
   isDeploy = true;
   return gulp.src(sources.overwatch)
@@ -99,6 +120,7 @@ gulp.task('deploy:ghpages', ['build:complete'], function(event) {
 });
 
 gulp.task('build:complete', [
+  'vendor:publish',
   'jade:compile',
   'stylus:compile',
   'coffee:compile'

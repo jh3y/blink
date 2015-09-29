@@ -43,14 +43,17 @@ a
   box-sizing border-box
 
 .grid
+  width     100px
+  display   flex
+  flex-wrap wrap
+  margin    0 auto
   &__cell
-    width   50%
-    height  50px
-    display inline-block
-    float   left
-    border  1px solid black
+    flex-basis 50px
+    width      50px
+    height     50px
+    border     1px solid black
     &.is--blinking
-      animation blinking 1s
+      animation blinking
 
 @keyframes blinking
   0%

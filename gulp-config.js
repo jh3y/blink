@@ -47,7 +47,15 @@ module.exports = {
       docs     : 'src/jade/*.jade',
       jade     : 'src/jade/**/*.jade',
       stylus   : 'src/stylus/**/*.stylus',
-      overwatch: env + '**/*.{html,js,css}'
+      overwatch: env + '**/*.{html,js,css}',
+      vendor   : {
+        js     : [
+          'src/vendor/lodash/lodash.min.js'
+        ],
+        css    : [
+          'src/vendor/normalize-css/normalize.css'
+        ]
+      }
     },
     destinations: {
       dist: './dist',

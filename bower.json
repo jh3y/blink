@@ -1,0 +1,21 @@
+{
+  "name": "blink",
+  "version": "0.0.0",
+  "homepage": "https://github.com/jh3y/blink",
+  "authors": [
+    "jh3y <jh3y@live.co.uk>"
+  ],
+  "description": "a memory based game",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "lodash": "~3.10.1",
+    "normalize-css": "normalize.css#~3.0.3"
+  }
+}
