@@ -19,6 +19,15 @@ gulp.task('serve', ['build:complete'], function(event) {
   return gulp.watch(sources.overwatch).on('change', browserSync.reload);
 });
 
+gulp.task('tmpl:compile', function(e) {
+  return gulp.src(sources.templates)
+    .pipe(plugins.jade())
+    .pipe(plugins.tmpl(pluginOpts.template))
+    .pipe(gulp.dest(destinations.templates));
+});
+gulp.task('tmpl:watch', function(e) {
+  gulp.watch(sources.templates, ['coffee:compile']);
+});
 
 
 /*
@@ -28,20 +37,22 @@ gulp.task('serve', ['build:complete'], function(event) {
   from source, concatenating and uglifying content and publishing output based on env flag. For example, if we want sourcemaps we can output our individual JS files and the sourcemap for them to the desired directory by using the --map flag.
 */
 
-gulp.task('coffee:compile', function(event) {
-  return gulp.src(sources.coffee)
+gulp.task('coffee:compile', ['tmpl:compile'], function(event) {
+  var coffeeFilter = plugins.filter(['**/*.coffee'], { restore: true });
+  return gulp.src([sources.coffee, destinations.templates + '**/*.*'])
     .pipe(plugins.plumber())
+    .pipe(coffeeFilter)
     .pipe(plugins.coffee(pluginOpts.coffee))
+    .pipe(coffeeFilter.restore)
     .pipe(isMapped ? gulp.dest(destinations.js): plugins.gUtil.noop())
     .pipe(isMapped ? plugins.sourcemaps.init(): plugins.gUtil.noop())
+    .pipe(plugins.order(pluginOpts.order))
     .pipe(plugins.concat(gConfig.pkg.name + '.js'))
     .pipe(plugins.wrap(pluginOpts.wrap))
     .pipe(isStat ? plugins.size(pluginOpts.gSize): plugins.gUtil.noop())
     .pipe(isDeploy ? plugins.gUtil.noop(): gulp.dest(isDist ? destinations.dist: destinations.js))
     .pipe(plugins.uglify())
-    .pipe(plugins.rename({
-      suffix: '.min'
-    }))
+    .pipe(plugins.rename(pluginOpts.rename))
     .pipe(isMapped ? plugins.sourcemaps.write('./'): plugins.gUtil.noop())
     .pipe(isStat ? plugins.size(pluginOpts.gSize): plugins.gUtil.noop())
     .pipe(gulp.dest(isDist ? destinations.dist: destinations.js));
@@ -65,9 +76,7 @@ gulp.task('stylus:compile', function(event) {
     .pipe(isDeploy ? plugins.gUtil.noop(): gulp.dest(isDist ? destination.dist: destinations.css))
     .pipe(plugins.prefix(gConfig.prefix))
     .pipe(plugins.minify())
-    .pipe(plugins.rename({
-      suffix: '.min'
-    }))
+    .pipe(plugins.rename(pluginOpts.rename))
     .pipe(isStat ? plugins.size(pluginOpts.gSize): plugins.gUtil.noop())
     .pipe(gulp.dest(isDist ? destination.dist: destinations.css));
 });

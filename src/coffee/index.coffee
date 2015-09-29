@@ -1,13 +1,13 @@
 DOMATTRIBUTES =
-  gameStarter: '.game__start'
-  gameReset  : '.game__reset'
-  grid       : '.grid'
-  gridCells  : '[data-cell-number]'
+  gameStarter  : '.game__start'
+  gameReset    : '.game__reset'
+  gridContainer: '.grid__container'
+  gridCells    : '[data-cell-number]'
 
 UICACHE =
-  gameStarter: DOMATTRIBUTES.gameStarter
-  gameReset  : DOMATTRIBUTES.gameReset
-  grid       : DOMATTRIBUTES.grid
+  gameStarter  : DOMATTRIBUTES.gameStarter
+  gameReset    : DOMATTRIBUTES.gameReset
+  gridContainer: DOMATTRIBUTES.gridContainer
 
 STATE =
   inplay: false
@@ -25,7 +25,6 @@ GAME = {}
 UI   = {}
 for ui of UICACHE
   UI[ui] = document.querySelector UICACHE[ui]
-UI.cells = document.querySelectorAll DOMATTRIBUTES.gridCells
 
 ###
   Game handling functions
@@ -69,6 +68,11 @@ resetGame = ->
   for cell in UI.cells
     cell.style.animationDuration = OPTIONS.animationDuration
 
+renderGrid = ->
+  grid = TEMPLATES.grid()
+  UI.gridContainer.innerHTML = grid
+  UI.cells = document.querySelectorAll DOMATTRIBUTES.gridCells
+
 startGame = ->
   levelSequence = generateSequence GAME.gridSize, GAME.sequenceLength
   GAME.levelSequence = levelSequence.slice()
@@ -102,13 +106,13 @@ handleUserInput = (e) ->
 
 ######
 
-
+renderGrid()
 
 BINDS =
   click:
-    gameStarter: initGame
-    gameReset  : resetGame
-    grid       : handleUserInput
+    gameStarter  : initGame
+    gameReset    : resetGame
+    gridContainer: handleUserInput
 
 ###
   Binds UI events based on BINDS objects.
