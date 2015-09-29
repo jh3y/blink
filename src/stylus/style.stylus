@@ -49,5 +49,13 @@ a
     display inline-block
     float   left
     border  1px solid black
-    &.is--active
-      background-color red
+    &.is--blinking
+      animation blinking 1s
+
+@keyframes blinking
+  0%
+    background-color transparent
+  50%
+    background-color red
+  100%
+    background-color transparent
