@@ -2,6 +2,7 @@ DOMATTRIBUTES =
   gameStarter  : '.game__start'
   gameReset    : '.game__reset'
   gridContainer: '.grid__container'
+  grid         : '.grid'
   gridCells    : '[data-cell-number]'
 
 UICACHE =
@@ -41,7 +42,6 @@ displaySequence  = (blinks) ->
       this.removeEventListener 'animationend', showNext
       this.className = 'grid__cell'
       if blinks.length is 0
-        console.log 'COMPLETE'
         STATE.inplay = true
         GAME.inputSequence = []
       else
@@ -61,25 +61,30 @@ generateSequence = (gridSize, sequenceSize) ->
   newSequence
 
 resetGame = ->
-  STATE.inplay        = false
-  GAME.level          = 1
-  GAME.sequenceLength = OPTIONS.sequenceLength
-  GAME.gridSize       = OPTIONS.gridSize
-  for cell in UI.cells
-    cell.style.animationDuration = OPTIONS.animationDuration
+  STATE.inplay           = false
+  GAME.level             = 1
+  GAME.sequenceLength    = OPTIONS.sequenceLength
+  GAME.gridSize          = OPTIONS.gridSize
+  GAME.animationDuration = OPTIONS.animationDuration
 
 renderGrid = ->
   grid = TEMPLATES.grid()
   UI.gridContainer.innerHTML = grid
   UI.cells = document.querySelectorAll DOMATTRIBUTES.gridCells
-
-startGame = ->
-  levelSequence = generateSequence GAME.gridSize, GAME.sequenceLength
-  GAME.levelSequence = levelSequence.slice()
-  setTimeout(->
-    console.info levelSequence
+  for cell in UI.cells
+    cell.style.animationDuration = GAME.animationDuration
+  UI.grid = document.querySelector DOMATTRIBUTES.grid
+  startShow = ->
+    UI.grid.removeEventListener 'animationend', startShow
+    levelSequence = generateSequence GAME.gridSize, GAME.sequenceLength
+    GAME.levelSequence = levelSequence.slice()
+    # NOTE:: CHEAT MODE
+    # console.info levelSequence
     displaySequence levelSequence
-  , 3000)
+  UI.grid.addEventListener 'animationend', startShow
+
+
+# startGame = ->
 
 initGame = ->
   ###
@@ -90,9 +95,9 @@ initGame = ->
     3. Reset user input arr...
 
   ###
-  console.info 'STARTING'
   resetGame()
-  startGame()
+  renderGrid()
+  # startGame()
 
 handleUserInput = (e) ->
   if STATE.inplay
@@ -105,8 +110,6 @@ handleUserInput = (e) ->
         alert 'Oh well, try again...'
 
 ######
-
-renderGrid()
 
 BINDS =
   click:
